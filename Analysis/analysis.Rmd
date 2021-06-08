@@ -1,0 +1,42 @@
+---
+title: "Analysis"
+author: "Kobe Sarausad"
+date: "6/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+source("../Code/my_rf_cv.R")
+
+```
+
+```{r}
+k_cv <- c()
+cv_error <- c()
+  
+for (k in c(2, 5, 10)) {
+  for (i in 1:30) {
+    cv_error <- append(cv_error, my_rf_cv(k)$cv_error)
+    k_cv <- append(k_cv, k)
+  }
+}
+
+error_df_rf <- data.frame(
+  k = k_cv,
+  cv_error = cv_error
+)
+
+plot <- ggplot(error_df_rf) +
+  geom_boxplot(aes(x = cv_error, y = as.factor(k)))
+
+ggsave("../Output/Figures/errorplot.png", plot)
+
+sum_stats <- error_df_rf %>% 
+  group_by(k) %>% 
+  summarize(mean = mean(cv_error), sd = sd(cv_error))
+
+```
