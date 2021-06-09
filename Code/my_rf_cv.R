@@ -15,7 +15,7 @@
 #' @export
 my_rf_cv <- function(k) {
   # Load in penguin data
-  penguins <- stats::na.omit(read.csv("../Data/my_penguins.csv"))
+  penguins <- stats::na.omit(read.csv("../Data/my_penguins.csv"))[, -1]
 
   # Generate random folds
   fold <- sample(rep(1:k, length = nrow(penguins)))
@@ -54,6 +54,3 @@ my_rf_cv <- function(k) {
   # Return result list
   return(res_list)
 }
-penguins <- stats::na.omit(read.csv("../Data/my_penguins.csv"))
-
-write.csv("../Data/my_penguins.csv", penguins[, -1])
