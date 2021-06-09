@@ -14,7 +14,7 @@ source("../Code/my_rf_cv.R")
 
 ```
 
-```{r}
+```{r error}
 k_cv <- c()
 cv_error <- c()
   
@@ -26,17 +26,31 @@ for (k in c(2, 5, 10)) {
 }
 
 error_df_rf <- data.frame(
-  k = k_cv,
+  k = as.factor(k_cv),
   cv_error = cv_error
 )
+
+```
+
+```{r objects}
+sims_error <- error_df_rf %>% 
+  group_by(k) %>% 
+  mutate(row = row_number()) %>% 
+  pivot_wider(names_from = k, values_from = cv_error) %>% 
+  select(-row)
 
 plot <- ggplot(error_df_rf) +
   geom_boxplot(aes(x = cv_error, y = as.factor(k)))
 
-ggsave("../Output/Figures/errorplot.png", plot)
-
 sum_stats <- error_df_rf %>% 
   group_by(k) %>% 
-  summarize(mean = mean(cv_error), sd = sd(cv_error))
+  summarize(mean = mean(cv_error), sd = sd(cv_error)) 
+```
 
+```{r save}
+ggsave("../Output/Figures/errorplot.png", plot)
+
+write_csv(sims_error, "../Output/Results/sims_error.csv")
+
+saveRDS(sum_stats, "../Output/Results/sums_stats.rds")
 ```
