@@ -8,23 +8,27 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+# Load necessary package
 library(tidyverse)
 
+# Source in code
 source("../Code/my_rf_cv.R")
-
 ```
 
 ```{r error}
-k_cv <- c()
-cv_error <- c()
+k_cv <- c() # initialize vector to store k
+cv_error <- c() # initialize vector to store cv error
   
+# loop through 2, 3, 5
 for (k in c(2, 5, 10)) {
+  # loop 30 times for each k
   for (i in 1:30) {
-    cv_error <- append(cv_error, my_rf_cv(k)$cv_error)
-    k_cv <- append(k_cv, k)
+    cv_error <- append(cv_error, my_rf_cv(k)) # compute and add error to vector
+    k_cv <- append(k_cv, k) # add k to vector
   }
 }
 
+# combine into single dataframe
 error_df_rf <- data.frame(
   k = as.factor(k_cv),
   cv_error = cv_error
@@ -33,24 +37,30 @@ error_df_rf <- data.frame(
 ```
 
 ```{r objects}
+# make data tidy
 sims_error <- error_df_rf %>% 
   group_by(k) %>% 
   mutate(row = row_number()) %>% 
   pivot_wider(names_from = k, values_from = cv_error) %>% 
   select(-row)
 
+# make the boxplot of the errors
 plot <- ggplot(error_df_rf) +
   geom_boxplot(aes(x = cv_error, y = as.factor(k)))
 
+# store mean and standard deviation of error
 sum_stats <- error_df_rf %>% 
   group_by(k) %>% 
   summarize(mean = mean(cv_error), sd = sd(cv_error)) 
 ```
 
 ```{r save}
+# save plot
 ggsave("../Output/Figures/errorplot.png", plot)
 
+# save the simulations as csv
 write_csv(sims_error, "../Output/Results/sims_error.csv")
 
+# save the table as rds file
 saveRDS(sum_stats, "../Output/Results/sums_stats.rds")
 ```

@@ -47,10 +47,7 @@ my_rf_cv <- function(k) {
     # Store error
     mse_list[i] <- mean(mse)
   }
-
-  # Store mean mse
-  res_list <- list("cv_error" = mean(mse_list))
-
-  # Return result list
-  return(res_list)
+  
+  # Return the mean of result list
+  return(mean(mse_list))
 }
